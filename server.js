@@ -1,9 +1,11 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const path = require("path");
 
 // const logger = require("./middlewear/logger");
 const morgan = require("morgan");
 const colors = require("colors");
+const fileupload = require("express-fileupload");
 const errorHandler = require("./middlewear/error");
 
 const connectDB = require("./config/db");
@@ -15,6 +17,7 @@ connectDB();
 
 // Route files
 const bootcamps = require("./routes/bootcamps");
+const courses = require("./routes/courses");
 
 const app = express();
 
@@ -26,11 +29,18 @@ app.use(express.json());
 
 // Morgan logging middlewear
 if (process.env.NODE_ENV == "development") {
-  app.use(morgan("combined"));
+  app.use(morgan("dev"));
 }
+
+// File uploading
+app.use(fileupload());
+
+// Set static folder
+app.use(express.static(path.join(__dirname, "public")));
 
 // Mount routers
 app.use("/api/v1/bootcamps", bootcamps);
+app.use("/api/v1/courses", courses);
 
 app.use(errorHandler);
 
